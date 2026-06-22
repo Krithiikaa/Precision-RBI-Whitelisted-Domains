@@ -1,0 +1,24 @@
+{
+  "name": "precision-rbi-admin-console",
+  "version": "2.0.0",
+  "description": "Operations dashboard (React, locally bundled — no CDN) + Node API.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "build": "esbuild src/App.jsx --bundle --minify --outfile=public/bundle.js --loader:.jsx=jsx",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dockerode": "^4.0.2",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1",
+    "pdfkit": "^0.15.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  },
+  "engines": { "node": ">=20" }
+}

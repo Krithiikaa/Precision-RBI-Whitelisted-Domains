@@ -1,0 +1,13 @@
+{
+  "name": "precision-rbi-bdr-service",
+  "version": "2.0.0",
+  "description": "Behaviour / DLP event collector for isolated sessions.",
+  "main": "bdr.js",
+  "type": "commonjs",
+  "scripts": { "start": "node bdr.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1"
+  },
+  "engines": { "node": ">=20" }
+}

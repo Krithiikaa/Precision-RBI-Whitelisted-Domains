@@ -1,0 +1,81 @@
+digraph PrecisionRBI {
+  // ── Precision RBI — Current System Architecture ──────────────────────────
+  rankdir=LR;
+  bgcolor="#0a0c0a";
+  pad=0.5;
+  nodesep=0.45;
+  ranksep=0.9;
+  fontname="Helvetica";
+  labelloc="t";
+  fontcolor="#7AC943";
+  fontsize=22;
+  label=<<B>Precision RBI — System Architecture</B>>;
+
+  node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=12
+        color="#2f6b00" fontcolor="#0a0c0a" fillcolor="#7AC943" penwidth=1.5
+        margin="0.18,0.12"];
+  edge [color="#9fb38a" fontname="Helvetica" fontsize=10 fontcolor="#c8d6ba"
+        penwidth=1.3 arrowsize=0.8];
+
+  // ── Client ───────────────────────────────────────────────────────────────
+  subgraph cluster_client {
+    label=<<B>Client Machine</B>>;
+    fontcolor="#7AC943"; color="#2f6b00"; style="rounded,dashed"; penwidth=1.5;
+    user   [label="User\n(Chrome / Brave)" fillcolor="#F4F7F2" fontcolor="#0a0c0a"];
+    ext    [label="Precision RBI\nExtension (MV3)\n• whitelist intercept\n• Canvas viewer\n• DLP guards"
+            fillcolor="#e8f5dc" fontcolor="#0a0c0a"];
+    user -> ext [style=invis];
+  }
+
+  // ── Edge ───────────────────────────────────────────────────────────────────
+  subgraph cluster_edge {
+    label=<<B>Edge</B>>;
+    fontcolor="#7AC943"; color="#2f6b00"; style="rounded,dashed"; penwidth=1.5;
+    nginx  [label="NGINX\n:80 / :443\nTLS · routing · WS upgrade" fillcolor="#7AC943"];
+  }
+
+  // ── Control / Services ─────────────────────────────────────────────────────
+  subgraph cluster_core {
+    label=<<B>Backend Services  (docker-compose · rbi-net)</B>>;
+    fontcolor="#7AC943"; color="#2f6b00"; style="rounded"; penwidth=1.5;
+    bgcolor="#11160e";
+    broker  [label="session-broker\n:3001\nspawn / reuse / teardown" fillcolor="#cfe9b4" fontcolor="#0a0c0a"];
+    gateway [label="render-gateway\n:3003\nWS frame relay" fillcolor="#cfe9b4" fontcolor="#0a0c0a"];
+    bdr     [label="bdr-service\n:3002\nDLP events · logs · whitelist" fillcolor="#cfe9b4" fontcolor="#0a0c0a"];
+    admin   [label="admin-console\n:3000\ndashboard · exports" fillcolor="#cfe9b4" fontcolor="#0a0c0a"];
+    redis   [label="Redis\n:6379\nsession state" shape=cylinder fillcolor="#F4F7F2" fontcolor="#0a0c0a"];
+    data    [label="prbi-data volume\nlogs.jsonl · whitelist.json" shape=folder fillcolor="#F4F7F2" fontcolor="#0a0c0a"];
+  }
+
+  // ── Per-tab isolation fleet ────────────────────────────────────────────────
+  subgraph cluster_fleet {
+    label=<<B>Per-Tab Isolated Browsers  (spawned on demand)</B>>;
+    fontcolor="#7AC943"; color="#2f6b00"; style="rounded,dashed"; penwidth=1.5;
+    c1 [label="rbi-container #1\nChromium + Xvfb\nCDP screencast → JPEG" fillcolor="#e8f5dc" fontcolor="#0a0c0a"];
+    c2 [label="rbi-container #2\nChromium + Xvfb\nCDP screencast → JPEG" fillcolor="#e8f5dc" fontcolor="#0a0c0a"];
+    cN [label="… up to MAX_SESSIONS" fillcolor="#1c2417" fontcolor="#cfe9b4" style="rounded,filled,dashed"];
+  }
+
+  // ── Flows ───────────────────────────────────────────────────────────────────
+  ext   -> nginx  [label="HTTPS API\n+ WSS stream"];
+  nginx -> broker [label="/api/*"];
+  nginx -> gateway[label="/render/*"];
+  nginx -> bdr    [label="/api/whitelist\n/api/bdr-*"];
+  nginx -> admin  [label="/admin"];
+
+  broker -> redis  [label="state"];
+  gateway-> redis  [label="lookup"];
+  bdr    -> redis  [label="counters"];
+  bdr    -> data   [label="persist"];
+  admin  -> bdr    [label="logs / whitelist"];
+  admin  -> broker [label="sessions"];
+
+  broker -> c1 [label="docker run" style=dashed color="#7AC943"];
+  broker -> c2 [style=dashed color="#7AC943"];
+  broker -> cN [style=dashed color="#7AC943"];
+  gateway -> c1 [label="frames (WS)" color="#7AC943"];
+  gateway -> c2 [color="#7AC943"];
+
+  c1 -> web [label="real internet"];
+  web [label="Whitelisted\nWebsites" shape=ellipse fillcolor="#F4F7F2" fontcolor="#0a0c0a"];
+}

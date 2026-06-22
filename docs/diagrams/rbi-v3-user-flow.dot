@@ -1,0 +1,44 @@
+// Precision RBI — v3 User Flow / Workflow
+// Render:  dot -Tpng rbi-v3-user-flow.dot -o rbi-v3-user-flow.png
+digraph RBI_v3_flow {
+  rankdir=TB;
+  bgcolor="white";
+  fontname="Helvetica";
+  labelloc="t";
+  fontsize=22;
+  label=<<b>Precision RBI — How a User Session Works (v3)</b><br/><font point-size="13" color="#414939">From typing a URL to a safe, isolated browsing stream</font>>;
+  node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=12 fillcolor="#ffffff" color="#c0cab4" penwidth=1.4];
+  edge [fontname="Helvetica" fontsize=10 color="#414939" penwidth=1.3];
+
+  s1 [label=<<b>1 · User types a URL</b><br/><font point-size="10">in Chrome, e.g. mail.google.com</font>>];
+  s2 [label=<<b>2 · Extension checks the whitelist</b><br/><font point-size="10">not listed → normal browsing (nothing happens)</font>> fillcolor="#f4f7f2"];
+  s3 [label=<<b>3 · Listed → intercept</b><br/><font point-size="10">show loading page, ask the server for a session</font>> fillcolor="#e8f5dc" color="#2f6b00"];
+  s4 [label=<<b>4 · Scheduler assigns a worker</b><br/><font point-size="10">reuse this user's browser, or pick the emptiest node</font>>];
+  s5 [label=<<b>5 · Worker opens an isolated tab</b><br/><font point-size="10">a new browser context inside the user's headless Chromium</font>>];
+  s6 [label=<<b>6 · The page renders on the server</b><br/><font point-size="10">the real website never touches the user's computer</font>>];
+  s7 [label=<<b>7 · Screen streamed back as video</b><br/><font point-size="10">WebRTC — efficient, smooth, low bandwidth</font>> fillcolor="#e8f5dc" color="#2f6b00"];
+  s8 [label=<<b>8 · User clicks &amp; types</b><br/><font point-size="10">mouse/keyboard sent to the server browser; DLP &amp; watermark applied</font>>];
+  s9 [label=<<b>9 · Tab/closed or idle</b><br/><font point-size="10">context torn down; node freed for the next user</font>> fillcolor="#fff7e6" color="#9a6a00"];
+
+  s1 -> s2;
+  s2 -> s3 [label="  whitelisted"];
+  s2 -> done_normal [label="  not whitelisted" color="#717a67" fontcolor="#717a67"];
+  done_normal [label=<<font point-size="10">Normal Chrome navigation</font>> shape=note fillcolor="#f4f7f2" color="#c0cab4"];
+  s3 -> s4;
+  s4 -> s5;
+  s5 -> s6;
+  s6 -> s7;
+  s7 -> s8;
+  s8 -> s7 [label="  live loop" style=dashed color="#2f6b00" fontcolor="#2f6b00" constraint=false];
+  s8 -> s9;
+
+  // safety callout
+  note [shape=plaintext fillcolor="white" label=<
+    <table border="1" cellborder="0" cellspacing="3" color="#7AC943">
+      <tr><td align="left"><b><font color="#2f6b00">Why it's safe</font></b></td></tr>
+      <tr><td align="left"><font point-size="10">The website runs on the server, not your PC.</font></td></tr>
+      <tr><td align="left"><font point-size="10">Different users never share a browser.</font></td></tr>
+      <tr><td align="left"><font point-size="10">Only pixels (video) come back — no risky code.</font></td></tr>
+    </table>>];
+  s7 -> note [style=invis];
+}

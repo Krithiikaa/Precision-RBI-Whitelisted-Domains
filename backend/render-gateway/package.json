@@ -1,0 +1,13 @@
+{
+  "name": "precision-rbi-render-gateway",
+  "version": "2.0.0",
+  "description": "WebSocket relay between client browsers and per-session frame-streamers. Zero-copy binary passthrough. No VNC.",
+  "main": "gateway.js",
+  "type": "commonjs",
+  "scripts": { "start": "node gateway.js" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.0"
+  },
+  "engines": { "node": ">=20" }
+}

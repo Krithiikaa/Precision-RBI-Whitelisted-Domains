@@ -1,0 +1,136 @@
+# ============================================================================
+# Precision RBI — Backend Service Orchestration
+# Selective Remote Browser Isolation (CDP + HTML5 Canvas, NO VNC)
+# ----------------------------------------------------------------------------
+# Services:
+#   nginx           80/443  TLS termination + routing + WS upgrade
+#   session-broker  3001    Container lifecycle (Dockerode), session API
+#   render-gateway  3003    WebSocket relay: client <-> frame-streamer
+#   bdr-service     3002    Behaviour / DLP event collector
+#   admin-console   3000    Operations dashboard (React + Node API)
+#   redis           6379    Ephemeral session + event store
+#
+# NOTE: precision-rbi-container is NOT defined here. It is built separately
+#       (see rbi-container/) and spawned per-session by the session-broker
+#       via the Docker socket.
+# ============================================================================
+
+services:
+
+  redis:
+    image: redis:7-alpine
+    container_name: prbi-redis
+    command: ["redis-server", "--appendonly", "no", "--save", ""]
+    networks:
+      - rbi-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  session-broker:
+    build: ./session-broker
+    container_name: prbi-session-broker
+    env_file: .env
+    ports:
+      - "127.0.0.1:3001:3001"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - RENDER_GATEWAY_URL=http://render-gateway:3003
+      - BDR_SERVICE_URL=http://bdr-service:3002
+    volumes:
+      # Broker needs the Docker socket to spawn per-session RBI containers.
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - rbi-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  render-gateway:
+    build: ./render-gateway
+    container_name: prbi-render-gateway
+    env_file: .env
+    ports:
+      - "127.0.0.1:3003:3003"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    networks:
+      - rbi-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  bdr-service:
+    build: ./bdr-service
+    container_name: prbi-bdr-service
+    env_file: .env
+    ports:
+      - "127.0.0.1:3002:3002"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATA_DIR=/data
+    volumes:
+      # Durable store for session logs + admin whitelist (survives restarts).
+      - rbi-data:/data
+    networks:
+      - rbi-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  admin-console:
+    build: ./admin-console
+    container_name: prbi-admin-console
+    env_file: .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - SESSION_BROKER_URL=http://session-broker:3001
+      - BDR_SERVICE_URL=http://bdr-service:3002
+      - RENDER_GATEWAY_URL=http://render-gateway:3003
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - rbi-net
+    depends_on:
+      - session-broker
+      - bdr-service
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: prbi-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - rbi-net
+    depends_on:
+      - session-broker
+      - render-gateway
+      - bdr-service
+      - admin-console
+    restart: unless-stopped
+
+networks:
+  # Shared bridge network. The per-session RBI containers are attached to this
+  # same network by the broker so render-gateway can reach them by container IP.
+  rbi-net:
+    name: rbi-net
+    external: true
+
+volumes:
+  # Durable store for session logs + admin-managed whitelist. Survives
+  # container/host restarts so log history is never lost on "close".
+  rbi-data:
+    name: prbi-data

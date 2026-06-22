@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precision RBI — Admin Console</title>
+  <style>
+    /* Brand fonts (served locally from /fonts — air-gap compliant) */
+    @font-face{font-family:'Montserrat';src:url('/fonts/Montserrat.woff2') format('woff2');font-weight:100 900;font-display:swap}
+    @font-face{font-family:'Libre Franklin';src:url('/fonts/LibreFranklin.woff2') format('woff2');font-weight:100 900;font-display:swap}
+
+    :root{
+      --bg:#F4F7F2; --surface:#FFFFFF; --surface-2:#EEEEEE;
+      --ink:#1a1c1c; --ink-2:#414939; --muted:#717a67;
+      --border:#dfe4d8; --border-2:#c0cab4;
+      --green:#7AC943; --green-ink:#2f6b00; --green-tint:#e8f5dc;
+      --black:#000; --error:#ba1a1a; --success:#2f6b00; --warning:#9a6a00;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);
+      font-family:'Libre Franklin',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+    h1,h2,h3{font-family:'Montserrat',system-ui,sans-serif;font-weight:700;margin:0;letter-spacing:-.01em}
+    a{color:var(--green-ink);text-decoration:none}
+    #root{min-height:100vh}
+    ::placeholder{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="bundle.js"></script>
+</body>
+</html>

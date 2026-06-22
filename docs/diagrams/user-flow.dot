@@ -1,0 +1,37 @@
+digraph PrecisionRBIFlow {
+  // ── Precision RBI — End-to-End User Flow ─────────────────────────────────
+  rankdir=TB;
+  bgcolor="#0a0c0a";
+  pad=0.5;
+  nodesep=0.4;
+  ranksep=0.55;
+  fontname="Helvetica";
+  labelloc="t";
+  fontcolor="#7AC943";
+  fontsize=22;
+  label=<<B>Precision RBI — User Flow</B>>;
+
+  node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=12
+        color="#2f6b00" fontcolor="#0a0c0a" fillcolor="#7AC943" penwidth=1.5
+        margin="0.2,0.13"];
+  edge [color="#9fb38a" fontname="Helvetica" fontsize=10 fontcolor="#c8d6ba"
+        penwidth=1.4 arrowsize=0.85];
+
+  s1 [label="1 · User types a URL\nin Chrome"];
+  s2 [label="2 · Extension intercepts\nnavigation (onBeforeNavigate)" fillcolor="#cfe9b4"];
+  dec [label="Domain on whitelist?" shape=diamond fillcolor="#F4F7F2" fontcolor="#0a0c0a"];
+  pass [label="Loads normally\n(no isolation)" fillcolor="#1c2417" fontcolor="#cfe9b4" style="rounded,filled,dashed"];
+  s3 [label="3 · Show loading page +\nPOST /api/start-session\nclientId = userId:tabId" fillcolor="#cfe9b4"];
+  s4 [label="4 · Broker spawns (or reuses)\nan isolated rbi-container\nChromium + Xvfb" fillcolor="#e8f5dc"];
+  s5 [label="5 · Container opens the real site,\nCDP screencast → JPEG frames" fillcolor="#e8f5dc"];
+  s6 [label="6 · render-gateway relays frames\nover WSS to the extension" fillcolor="#cfe9b4"];
+  s7 [label="7 · Canvas viewer paints frames;\nclicks/keys sent back as input"];
+  s8 [label="8 · DLP guards active:\nno clipboard / downloads / screenshots,\nwatermark overlay" fillcolor="#e8f5dc"];
+  s9 [label="9 · Activity logged to bdr-service\n(time, IP, URL, RAM/CPU, threats)" fillcolor="#cfe9b4"];
+  s10[label="10 · Tab closed / idle →\nsession log persisted, container torn down" fillcolor="#cfe9b4"];
+
+  s1 -> s2 -> dec;
+  dec -> pass [label="no"];
+  dec -> s3   [label="yes"];
+  s3 -> s4 -> s5 -> s6 -> s7 -> s8 -> s9 -> s10;
+}

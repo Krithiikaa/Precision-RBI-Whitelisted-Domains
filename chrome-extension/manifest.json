@@ -1,0 +1,66 @@
+{
+  "manifest_version": 3,
+  "name": "Precision RBI",
+  "version": "2.0.0",
+  "description": "Selective Remote Browser Isolation — sensitive domains are streamed from a server-side isolated browser (CDP/Canvas, no VNC).",
+  "minimum_chrome_version": "116",
+
+  "permissions": [
+    "webNavigation",
+    "tabs",
+    "storage",
+    "alarms"
+  ],
+
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Precision RBI",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "options_page": "options/options.html",
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content/content-script.js"],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "rbi-viewer/viewer.html",
+        "rbi-viewer/viewer.js",
+        "loading/loading.html",
+        "loading/loading.js",
+        "content/watermark.js",
+        "fonts/Montserrat.woff2",
+        "fonts/LibreFranklin.woff2"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

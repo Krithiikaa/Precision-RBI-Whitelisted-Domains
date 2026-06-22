@@ -1,0 +1,26 @@
+# ── Secrets (NEVER commit) ─────────────────────────────────────────────────
+backend/.env
+.env
+*.key
+backend/nginx/certs/server.key
+backend/nginx/certs/server.crt
+backend/nginx/certs/openssl.cnf
+
+# ── Dependencies / build output ────────────────────────────────────────────
+node_modules/
+**/node_modules/
+dist/
+build/
+public/bundle.js
+
+# ── Runtime / data ─────────────────────────────────────────────────────────
+*.log
+data/
+*.jsonl
+
+# ── OS / editor junk ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

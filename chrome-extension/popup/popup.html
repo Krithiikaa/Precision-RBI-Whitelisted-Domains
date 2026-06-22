@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="popup.css" />
+  <title>Precision RBI</title>
+</head>
+<body>
+  <header class="hdr">
+    <div class="brand">
+      <span class="logo">Precision RBI</span>
+      <span id="statusDot" class="dot dot-amber" title="status"></span>
+    </div>
+    <button id="gear" class="icon-btn" title="Settings">⚙</button>
+  </header>
+
+  <section class="toggle-row">
+    <div>
+      <div class="toggle-label">Isolation Active</div>
+      <div class="toggle-sub" id="enabledSub">Intercepting sensitive domains</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="enabledToggle" />
+      <span class="slider"></span>
+    </label>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-k">Server</div>
+      <div class="stat-v"><span id="pingBadge" class="badge badge-gray">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-k">Active sessions</div>
+      <div class="stat-v" id="sessCount">— / —</div>
+    </div>
+  </section>
+
+  <section class="current">
+    <div class="current-row">
+      <span id="shield" class="shield shield-gray">●</span>
+      <div>
+        <div class="current-domain" id="curDomain">—</div>
+        <div class="current-state" id="curState">checking…</div>
+      </div>
+    </div>
+    <button id="openRbi" class="btn-primary">Open Current Page in RBI</button>
+  </section>
+
+  <section class="sessions">
+    <div class="sessions-title">Isolated sessions</div>
+    <ul id="sessionList" class="session-list"></ul>
+    <div id="noSessions" class="empty">No active isolated sessions.</div>
+  </section>
+
+  <footer class="ftr" id="serverHint" style="display:none">
+    <span>⚠ Server URL not set.</span>
+    <a href="#" id="openOptions">Open settings</a>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

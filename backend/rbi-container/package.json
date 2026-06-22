@@ -1,0 +1,12 @@
+{
+  "name": "rbi-frame-streamer",
+  "version": "1.0.0",
+  "description": "CDP-based frame capture and input injection — no VNC",
+  "main": "frame-streamer.js",
+  "type": "commonjs",
+  "dependencies": {
+    "chrome-remote-interface": "^0.33.0",
+    "ws": "^8.17.0"
+  },
+  "engines": { "node": ">=20" }
+}

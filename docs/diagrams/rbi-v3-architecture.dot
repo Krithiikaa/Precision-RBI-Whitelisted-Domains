@@ -1,0 +1,74 @@
+// Precision RBI — v3 Production Architecture
+// Render:  dot -Tpng rbi-v3-architecture.dot -o rbi-v3-architecture.png
+digraph RBI_v3 {
+  rankdir=TB;
+  bgcolor="white";
+  fontname="Helvetica";
+  labelloc="t";
+  fontsize=24;
+  nodesep=0.5;
+  ranksep=0.7;
+  label=<<b>Precision RBI — Production Architecture (v3)</b><br/><font point-size="13" color="#414939">Scales to thousands of concurrent users by adding worker machines</font><br/> >;
+  node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=12 color="#c0cab4" penwidth=1.5];
+  edge [fontname="Helvetica" fontsize=10 color="#414939" penwidth=1.4];
+
+  // ---------- Users ----------
+  users [label=<<b>Thousands of Users</b><br/><font point-size="10">Chrome + Precision RBI extension</font>> fillcolor="#e8f5dc" color="#2f6b00" penwidth=2];
+
+  // ---------- Front door ----------
+  lb [label=<<b>① Load Balancer + TLS</b><br/><font point-size="10">front door · spreads traffic · real certificate</font>> fillcolor="#ffffff"];
+
+  // ---------- Brain ----------
+  subgraph cluster_brain {
+    label="BRAIN  (control plane — stateless, replicated)"; fontsize=12; color="#7AC943"; style="rounded"; penwidth=2; fontcolor="#2f6b00";
+    sched [label=<<b>② Session Manager / Scheduler</b><br/><font point-size="10">picks the emptiest worker for each user</font>> fillcolor="#ffffff"];
+    redis [label=<<b>Redis</b><br/><font point-size="10">which user is on<br/>which node</font>> fillcolor="#eeeeee" shape="cylinder"];
+    auto  [label=<<b>Autoscaler</b><br/><font point-size="10">adds / removes<br/>nodes on demand</font>> fillcolor="#fff7e6" color="#9a6a00"];
+    sched -> redis [label="  look up / assign" dir=both color="#2f6b00"];
+  }
+
+  // ---------- Worker fleet ----------
+  subgraph cluster_fleet {
+    label="③ WORKER FLEET   (add machines = more capacity · ~50–150 tabs each)"; fontsize=12; color="#7AC943"; style="rounded"; penwidth=2; fontcolor="#2f6b00";
+
+    subgraph cluster_n1 {
+      label="Worker Node 1"; fontsize=11; color="#c0cab4"; style="rounded";
+      n1 [label=<<b>Headless Chromium — per USER</b><br/><font point-size="9">Playwright · sandbox per user</font>> fillcolor="#ffffff"];
+      n1c [label=<<b>Tab A</b> &#124; <b>Tab B</b> &#124; <b>Tab C</b><br/><font point-size="9">browser contexts (isolated)</font>> fillcolor="#e8f5dc" color="#2f6b00"];
+      n1 -> n1c [style=dashed arrowhead=none];
+    }
+    subgraph cluster_n2 {
+      label="Worker Node 2"; fontsize=11; color="#c0cab4"; style="rounded";
+      n2 [label=<<b>Headless Chromium — per USER</b><br/><font point-size="9">Playwright · sandbox per user</font>> fillcolor="#ffffff"];
+      n2c [label=<<b>Tab</b> &#124; <b>Tab</b> &#124; <b>Tab</b><br/><font point-size="9">browser contexts (isolated)</font>> fillcolor="#e8f5dc" color="#2f6b00"];
+      n2 -> n2c [style=dashed arrowhead=none];
+    }
+    nN [label=<<b>Worker Node N …</b><br/><font point-size="9">added automatically<br/>as load grows</font>> fillcolor="#ffffff" style="rounded,filled,dashed"];
+  }
+
+  // ---------- Main flow (top to bottom) ----------
+  users -> lb [label="  HTTPS / WebRTC"];
+  lb -> sched [label="  request"];
+  sched -> n1 [label="  user → node"];
+  sched -> n2;
+  sched -> nN;
+  auto -> nN [label="scale out" style=dashed color="#9a6a00" fontcolor="#9a6a00"];
+
+  // ---------- Return stream (one clean edge) ----------
+  fleetback [label=<<b>WebRTC video stream</b>  →  back to each user<br/><font point-size="9">only pixels travel back — no website code reaches the PC</font>> shape=box style="rounded,filled" fillcolor="#e8f5dc" color="#2f6b00"];
+  n1c -> fleetback [style=invis];
+  fleetback -> users [label="  live video back" color="#2f6b00" penwidth=2 style=bold constraint=false];
+
+  // ---------- Legend (bottom) ----------
+  subgraph cluster_legend {
+    label="LEGEND"; fontsize=11; color="#dfe4d8"; style="rounded";
+    leg [shape=plaintext fillcolor="white" label=<
+      <table border="0" cellborder="0" cellspacing="3">
+        <tr><td align="left"><font color="#2f6b00">▣ one browser per USER</font> — strong isolation between people</td></tr>
+        <tr><td align="left"><font color="#2f6b00">▦ one CONTEXT per TAB</font> — cheap (~0.2 GB), many per browser</td></tr>
+        <tr><td align="left"><font color="#9a6a00">▣ autoscaling</font> — machines added/removed with demand</td></tr>
+        <tr><td align="left"><b>Capacity:</b> ~100 tabs / node  →  ~10 nodes per 1,000 users  →  ~100 per 10,000</td></tr>
+      </table>>];
+  }
+  fleetback -> leg [style=invis];
+}

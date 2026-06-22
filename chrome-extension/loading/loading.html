@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precision RBI — Opening isolated session…</title>
+  <style>
+    @font-face{font-family:'Montserrat';src:url('../fonts/Montserrat.woff2') format('woff2');font-weight:100 900;font-display:block}
+    @font-face{font-family:'Libre Franklin';src:url('../fonts/LibreFranklin.woff2') format('woff2');font-weight:100 900;font-display:block}
+
+    :root{
+      --obsidian:#0a0c0a; --surface:#14171340;
+      --green:#7AC943; --green-dim:#8adb53;
+      --text:#f0f1f1; --text-dim:#a8b0a4;
+      --danger:#ff6b4a; --warning:#e8a83a;
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{
+      width:100%;height:100%;
+      background:radial-gradient(1200px 600px at 50% -10%, #11160f 0%, var(--obsidian) 60%);
+      font-family:'Libre Franklin',system-ui,sans-serif;color:var(--text);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .card{display:flex;flex-direction:column;align-items:center;gap:18px;padding:40px 48px;max-width:460px;text-align:center}
+    .brand{font-family:'Montserrat',sans-serif;font-weight:700;font-size:22px;letter-spacing:.2px;color:var(--green)}
+    .spinner{
+      width:52px;height:52px;border:3px solid rgba(122,201,67,.16);
+      border-top-color:var(--green);border-radius:50%;animation:spin .9s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .title{font-family:'Montserrat',sans-serif;font-size:17px;font-weight:600;color:var(--text)}
+    .title .domain{color:var(--green)}
+    .sub{font-size:13px;color:var(--text-dim);line-height:1.5}
+    .icon-err{
+      width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:26px;border:1px solid var(--danger);color:var(--danger);
+    }
+    .icon-warn{border-color:var(--warning);color:var(--warning)}
+    .actions{margin-top:6px}
+    button{
+      font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:#06210a;
+      background:var(--green);border:none;border-radius:4px;padding:10px 22px;cursor:pointer;transition:150ms ease;
+    }
+    button:hover{background:var(--green-dim)}
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand">Precision RBI</div>
+
+    <!-- Default: loading -->
+    <div id="loadingView">
+      <div class="spinner" style="margin: 0 auto 18px;"></div>
+      <div class="title">Opening <span class="domain" id="domainLabel">site</span> in isolated browser…</div>
+      <div class="sub">Establishing secure pixel stream to security server.</div>
+    </div>
+
+    <!-- Error / capacity -->
+    <div id="errorView" class="hidden">
+      <div class="icon-err" id="errIcon" style="margin: 0 auto 18px;">!</div>
+      <div class="title" id="errTitle">Unable to open isolated session</div>
+      <div class="sub" id="errSub"></div>
+      <div class="actions">
+        <button id="retryBtn">Retry</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="loading.js"></script>
+</body>
+</html>

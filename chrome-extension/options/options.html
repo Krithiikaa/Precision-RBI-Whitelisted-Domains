@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Precision RBI — Settings</title>
+  <style>
+    /* ── Brand fonts (local woff2, air-gap compliant) ─────────────────────── */
+    @font-face{font-family:'Montserrat';src:url('../fonts/Montserrat.woff2') format('woff2');font-weight:100 900;font-display:swap}
+    @font-face{font-family:'Libre Franklin';src:url('../fonts/LibreFranklin.woff2') format('woff2');font-weight:100 900;font-display:swap}
+
+    /* ── Luminous Bio-Tech palette ────────────────────────────────────────── */
+    :root{
+      --bg:#F4F7F2; --surface:#FFFFFF; --surface-2:#EEEEEE;
+      --ink:#1a1c1c; --ink-2:#414939; --muted:#717a67;
+      --border:#dfe4d8; --border-2:#c0cab4;
+      --green:#7AC943; --green-ink:#2f6b00; --green-tint:#e8f5dc;
+      --black:#000; --error:#ba1a1a; --success:#2f6b00;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      background:var(--bg); color:var(--ink);
+      font-family:'Libre Franklin',system-ui,sans-serif; font-size:14px;
+      padding:48px 24px; line-height:1.5;
+    }
+    .wrap{max-width:680px;margin:0 auto}
+
+    h1{font-family:'Montserrat',sans-serif;font-size:32px;font-weight:700;letter-spacing:-.02em;margin-bottom:2px}
+    h1 .accent{color:var(--green-ink)}
+    .sub{color:var(--ink-2);margin-bottom:28px;font-size:14px}
+
+    .card{
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:22px;margin-bottom:16px;
+    }
+    .card h2{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;margin-bottom:16px}
+
+    label.field{display:block;margin-bottom:14px}
+    .field-label{
+      display:block;color:var(--ink-2);font-size:12px;font-weight:600;
+      text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;
+    }
+    input[type=text]{
+      width:100%;background:var(--surface);color:var(--ink);
+      border:1px solid var(--border-2);border-radius:4px;padding:11px 12px;
+      font-family:'Libre Franklin',sans-serif;font-size:14px;transition:150ms ease;
+    }
+    input[type=text]::placeholder{color:var(--muted)}
+    input[type=text]:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(122,201,67,.18)}
+
+    .radio-row,.check-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;cursor:pointer}
+    .radio-row:last-child,.check-row:last-child{margin-bottom:0}
+    input[type=checkbox],input[type=radio]{accent-color:var(--green);width:16px;height:16px;cursor:pointer}
+
+    .btn{
+      font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;
+      background:transparent;color:var(--ink);border:1px solid var(--black);
+      border-radius:4px;padding:10px 18px;cursor:pointer;transition:150ms ease;
+    }
+    .btn:hover{background:var(--surface-2)}
+    .btn-save{background:var(--green);color:#06210a;border-color:var(--green)}
+    .btn-save:hover{background:#6cb838}
+    .test-result{margin-left:12px;font-size:13px;font-weight:500}
+    .ok{color:var(--success)} .err{color:var(--error)}
+
+    .domain-grid{display:flex;flex-wrap:wrap;gap:8px}
+    .domain-grid div{
+      background:var(--green-tint);color:var(--green-ink);
+      border-radius:8px;padding:5px 11px;font-size:12px;font-weight:500;
+    }
+
+    .toggle-inline{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .saved{color:var(--success);font-size:13px;font-weight:600;margin-left:12px}
+    .actions{display:flex;align-items:center;margin-top:4px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Precision <span class="accent">RBI</span></h1>
+    <p class="sub">Selective Remote Browser Isolation — settings</p>
+
+    <div class="card">
+      <h2>Server</h2>
+      <label class="field">
+        <span class="field-label">Server URL (e.g. https://10.225.244.10)</span>
+        <input type="text" id="serverUrl" placeholder="https://10.225.244.10" />
+      </label>
+      <div class="actions">
+        <button class="btn" id="testBtn">Test Connection</button>
+        <span class="test-result" id="testResult"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Isolation</h2>
+      <div class="toggle-inline">
+        <span>Enable RBI interception globally</span>
+        <label class="check-row"><input type="checkbox" id="enabled" /></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Stream mode</h2>
+      <label class="radio-row"><input type="radio" name="streamMode" value="auto" /> Auto (WebRTC if supported, Canvas fallback)</label>
+      <label class="radio-row"><input type="radio" name="streamMode" value="canvas" /> Force Canvas (maximum compatibility)</label>
+      <label class="radio-row"><input type="radio" name="streamMode" value="webrtc" /> Force WebRTC (lowest latency)</label>
+    </div>
+
+    <div class="card">
+      <h2>Data-loss prevention</h2>
+      <label class="check-row"><input type="checkbox" id="dlpClipboard" /> Block clipboard in isolated sessions</label>
+      <label class="check-row"><input type="checkbox" id="dlpDownloads" /> Block downloads in isolated sessions</label>
+      <label class="check-row"><input type="checkbox" id="dlpWatermark" /> Show watermark overlay</label>
+      <label class="check-row"><input type="checkbox" id="dlpScreenshot" /> Block screenshot attempts</label>
+    </div>
+
+    <div class="card">
+      <h2>Isolated domains (read-only)</h2>
+      <div class="domain-grid" id="domainGrid"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-save" id="saveBtn">Save</button>
+      <span class="saved" id="savedMsg" style="display:none">Saved ✓</span>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

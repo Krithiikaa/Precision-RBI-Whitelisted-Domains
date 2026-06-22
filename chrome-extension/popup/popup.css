@@ -1,0 +1,74 @@
+/* ── Brand fonts (local woff2, air-gap compliant) ───────────────────────── */
+@font-face{font-family:'Montserrat';src:url('../fonts/Montserrat.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'Libre Franklin';src:url('../fonts/LibreFranklin.woff2') format('woff2');font-weight:100 900;font-display:swap}
+
+/* ── Luminous Bio-Tech palette ──────────────────────────────────────────── */
+:root{
+  --bg:#F4F7F2; --surface:#FFFFFF; --surface-2:#EEEEEE;
+  --ink:#1a1c1c; --ink-2:#414939; --muted:#717a67;
+  --border:#dfe4d8; --border-2:#c0cab4;
+  --green:#7AC943; --green-ink:#2f6b00; --green-tint:#e8f5dc;
+  --black:#000; --error:#ba1a1a; --success:#2f6b00; --warning:#9a6a00;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  width:360px; max-height:560px; overflow-y:auto;
+  background:var(--bg); color:var(--ink);
+  font-family:'Libre Franklin',system-ui,-apple-system,Segoe UI,sans-serif;
+  font-size:13px; padding:16px; line-height:1.45;
+}
+
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{font-family:'Montserrat',sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-green{background:var(--green)} .dot-amber{background:var(--warning)} .dot-red{background:var(--error)}
+.icon-btn{background:transparent;border:none;color:var(--muted);font-size:16px;cursor:pointer;transition:150ms ease}
+.icon-btn:hover{color:var(--green-ink)}
+
+.toggle-row{display:flex;justify-content:space-between;align-items:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.toggle-label{font-family:'Montserrat',sans-serif;font-weight:600}
+.toggle-sub{color:var(--ink-2);font-size:11px;margin-top:2px}
+.switch{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.switch input{display:none}
+.slider{position:absolute;inset:0;background:#cfd6c8;border-radius:24px;cursor:pointer;transition:150ms ease}
+.slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:150ms ease}
+.switch input:checked + .slider{background:var(--green)}
+.switch input:checked + .slider:before{transform:translateX(18px)}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px}
+.stat-k{color:var(--ink-2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.stat-v{font-family:'Montserrat',sans-serif;font-size:15px;margin-top:5px;font-weight:600}
+.badge{font-size:11px;font-weight:600;padding:2px 9px;border-radius:8px}
+.badge-gray{background:var(--surface-2);color:var(--muted)}
+.badge-green{background:var(--green-tint);color:var(--green-ink)}
+.badge-red{background:#ffdad6;color:#93000a}
+
+.current{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
+.current-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.shield{font-size:18px}
+.shield-green{color:var(--green-ink)} .shield-gray{color:var(--muted)}
+.current-domain{font-family:'Montserrat',sans-serif;font-weight:600;word-break:break-all}
+.current-state{color:var(--ink-2);font-size:11px}
+.btn-primary{width:100%;font-family:'Montserrat',sans-serif;font-weight:600;
+  background:var(--green);color:#06210a;border:1px solid var(--green);
+  border-radius:4px;padding:10px;cursor:pointer;font-size:13px;transition:150ms ease}
+.btn-primary:hover{background:#6cb838}
+
+.sessions-title{color:var(--ink-2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.session-list{list-style:none}
+.session-item{display:flex;justify-content:space-between;align-items:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 11px;margin-bottom:6px}
+.session-domain{font-family:'Montserrat',sans-serif;font-weight:600}
+.session-meta{color:var(--ink-2);font-size:11px;display:flex;gap:6px;align-items:center}
+.pill{font-size:10px;font-weight:600;padding:1px 8px;border-radius:8px;background:var(--green-tint);color:var(--green-ink)}
+.pill-webrtc{background:#dbe7ff;color:#0d4a8a}
+.close-btn{background:transparent;border:1px solid var(--error);color:var(--error);border-radius:4px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:600}
+.close-btn:hover{background:#ffdad6}
+.empty{color:var(--muted);font-size:12px;padding:6px 0}
+
+.ftr{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--warning)}
+.ftr a{color:var(--green-ink);font-weight:600;text-decoration:none}
+.ftr a:hover{text-decoration:underline}
